@@ -1,0 +1,32 @@
+version: "3.7"
+
+services:
+    bot:
+        image: nti2020-solution
+        build:
+            context: .
+        container_name: paymentbot
+        environment:
+            - "WEB_PORT=${WEB_PORT}"
+            - "WEB_HOST=${WEB_HOST}"
+            - "WEB3_PROVIDER=${WEB3_PROVIDER}"
+            - "BOT_TOKEN=${BOT_TOKEN}"
+            - "BOT_ADMIN=${BOT_ADMIN}"
+        depends_on: 
+            - mongo
+        
+        command: ["./wait_for_it.sh", "mongo:27017", "--", "python3", "./run.py"]
+        
+        ports:
+             - "${WEB_PORT:-31488}:${WEB_PORT:-31488}"
+
+    mongo:
+        image: mongo
+        restart: always
+        hostname: 'mongo'
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: password
+        
+        volumes:
+            - "./mongodb_data:/data/db"
